@@ -1,0 +1,5 @@
+Client/node_modules
+Client/package-lock.json
+authServer/node_modules
+authServer/package-lock.json
+authServer/Images
