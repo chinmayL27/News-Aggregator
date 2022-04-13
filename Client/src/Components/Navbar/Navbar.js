@@ -16,7 +16,7 @@ const Navbar = () => {
     navigate("/");
   };
   const profilebtn = () => {
-    navigate("/admin");
+    navigate("/edit");
   };
   return (
     <div>

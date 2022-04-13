@@ -7,36 +7,36 @@ const Navbar2 = () => {
   return (
     <div>
       <div className="upper-header container-fluid" style={{ display: "flex" }}>
-        <a class="navbar-brand" href="index.php">
+        <a className="navbar-brand" href="index.php">
           <img src={logo} alt="" width="50" height="50" />
         </a>
-        <form class="form-inline  my-2 my-lg-0">
-          <div class="search-box">
-            <button class="btn-search">
-              <i class="fas fa-search"></i>
+        <form className="form-inline  my-2 my-lg-0">
+          <div className="search-box">
+            <button className="btn-search">
+              <i className="fas fa-search"></i>
             </button>
             <input
               type="text"
-              class="input-search"
+              className="input-search"
               placeholder="Type to Search..."
             />
           </div>
           {/* <input
-            class="form-control mr-sm-2"
+            className="form-control mr-sm-2"
             type="search"
             placeholder="Search"
             aria-label="Search"
           />
-          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+          <button className="btn btn-outline-success my-2 my-sm-0" type="submit">
             Search
           </button> */}
         </form>
       </div>
 
-      <nav class="navbar navbar-expand-lg navbar-light ">
-        <div class="container-fluid">
+      <nav className="navbar navbar-expand-lg navbar-light ">
+        <div className="container-fluid">
           <button
-            class="navbar-toggler"
+            className="navbar-toggler"
             type="button"
             data-toggle="collapse"
             data-target="#navbarSupportedContent"
@@ -44,40 +44,40 @@ const Navbar2 = () => {
             aria-expanded="false"
             aria-label="Toggle navigation"
           >
-            <span class="navbar-toggler-icon"></span>
+            <span className="navbar-toggler-icon"></span>
           </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item active">
-                {/* <a class="nav-link" href="#">
+          <div className="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul className="navbar-nav mr-auto">
+              <li className="nav-item active">
+                {/* <a className="nav-link" href="#">
                   HOME
                 </a> */}
                 <Link to="/" className="nav-link active">
                   HOME
                 </Link>
               </li>
-              <li class="nav-item">
+              <li className="nav-item">
                 <Link to="/category/sports" className="nav-link active">
                   SPORTS
                 </Link>
               </li>
-              <li class="nav-item">
+              <li className="nav-item">
                 <Link to="/category/general" className="nav-link active">
                   GENERAL
                 </Link>
               </li>
-              <li class="nav-item">
+              <li className="nav-item">
                 <Link to="/category/business" className="nav-link active">
-                 BUSINESS
+                  BUSINESS
                 </Link>
               </li>
-              <li class="nav-item">
+              <li className="nav-item">
                 <Link to="/category/entertainment" className="nav-link active">
                   ENTERTAINMENT
                 </Link>
               </li>
 
-              <li class="nav-item">
+              <li className="nav-item">
                 <Link to="/category/health" className="nav-link active">
                   HEALTH
                 </Link>
@@ -85,7 +85,10 @@ const Navbar2 = () => {
             </ul>
           </div>
           <ul>
-            <button class="btn btn-outline-white my-2 my-sm-0" type="submit">
+            <button
+              className="btn btn-outline-white my-2 my-sm-0"
+              type="submit"
+            >
               LOGOUT
             </button>
           </ul>

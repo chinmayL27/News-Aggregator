@@ -1,12 +1,29 @@
 import React from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 import "./Profile.css";
+import "./ProfileEdit.css";
+
 export const Profile = () => {
+  const [userList, setUserList] = useState({});
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8000/user`, {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+        },
+      })
+      .then((response) => {
+        setUserList(response.data);
+      });
+  }, []);
+
   return (
     <>
       <Navbar />
-      <div className="container">
+      <div className="container ">
         <div className="main-body">
           <div className="row gutters-sm">
             <div className="col-md-4 mb-3">
@@ -14,13 +31,13 @@ export const Profile = () => {
                 <div className="card-body">
                   <div className="d-flex flex-column align-items-center text-center">
                     <img
-                      src="https://bootdey.com/img/Content/avatar/avatar7.png"
+                      src={`http://localhost:8000/files/${userList.image}`}
                       alt="Admin"
                       className="rounded-circle"
                       width="150"
                     />
                     <div className="mt-3">
-                      <h4>John Doe</h4>
+                      <h4> {userList.name}</h4>
                       <p className="text-secondary mb-1">
                         Full Stack Developer
                       </p>
@@ -40,7 +57,7 @@ export const Profile = () => {
                       <h6 className="mb-0">Full Name</h6>
                     </div>
                     <div className="col-sm-9 text-secondary">
-                      Kenneth Valdez
+                      {userList.name}
                     </div>
                   </div>
                   <hr />
@@ -48,39 +65,27 @@ export const Profile = () => {
                     <div className="col-sm-3">
                       <h6 className="mb-0">Email</h6>
                     </div>
-                    <div className="col-sm-9 text-secondary">fip@jukmuh.al</div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Phone</h6>
-                    </div>
                     <div className="col-sm-9 text-secondary">
-                      (239) 816-9029
+                      {userList.email}
                     </div>
                   </div>
                   <hr />
                   <div className="row">
                     <div className="col-sm-3">
-                      <h6 className="mb-0">Mobile</h6>
+                      <h6 className="mb-0">Category</h6>
                     </div>
                     <div className="col-sm-9 text-secondary">
-                      (320) 380-4539
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div className="col-sm-3">
-                      <h6 className="mb-0">Address</h6>
-                    </div>
-                    <div className="col-sm-9 text-secondary">
-                      Bay Area, San Francisco, CA
+                      {userList.categories
+                        ? userList.categories.map((elements) => (
+                            <div>{elements}</div>
+                          ))
+                        : ["N/A"]}
                     </div>
                   </div>
                   <hr />
                   <div className="row">
                     <div className="col-sm-12">
-                      <Link className="btn btn-info " to="/newsfeed">
+                      <Link className="btn btn-info" to={`/edit/id`}>
                         Edit
                       </Link>
                     </div>
