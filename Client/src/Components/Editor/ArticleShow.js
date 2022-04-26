@@ -9,7 +9,7 @@ const ArticleShow = () => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/getAllEditors`, {
+      .get(`http://localhost:8000/editors`, {
         headers: {
           Authorization: "Bearer " + window.localStorage.getItem("token"),
         },

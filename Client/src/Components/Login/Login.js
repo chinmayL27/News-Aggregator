@@ -16,9 +16,13 @@ const Login = () => {
         password: password,
       });
 
-      const response = await axios.post("http://localhost:8000/login", data, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axios.post(
+        "http://localhost:8000/user/login",
+        data,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       const token = response.data.token;
 
@@ -38,7 +42,7 @@ const Login = () => {
           <h1>Login</h1>
           <div className="pageSwitcher">
             <NavLink
-              to="/login"
+              to="/user/login"
               activeClassName="pageSwitcherItem-active"
               className="pageSwitcherItem reader"
               style={{ border: "2.5px solid #FF4411" }}
@@ -47,7 +51,7 @@ const Login = () => {
             </NavLink>
             <NavLink
               exact
-              to="/editorlogin"
+              to="/editor/login"
               activeClassName="pageSwitcherItem-active"
               className="pageSwitcherItem "
             >
@@ -89,7 +93,7 @@ const Login = () => {
             </button>
             <div className="signup_link">
               Not a member?{" "}
-              <Link className="nav-link" to={"/signup"}>
+              <Link className="nav-link" to={"/user/signup"}>
                 Register
               </Link>
             </div>

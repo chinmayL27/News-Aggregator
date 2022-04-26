@@ -21,10 +21,10 @@ function App() {
       {/* <BounceLoader loading size={34} color="red" /> */}
       <BrowserRouter>
         <Routes>
-          <Route exact path="/login" element={<LoginPage />} />
-          <Route exact path="/editorlogin" element={<EditorLogin />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/editorsignup" element={<EditorSignup />} />
+          <Route exact path="/user/login" element={<LoginPage />} />
+          <Route exact path="/editor/login" element={<EditorLogin />} />
+          <Route path="/user/signup" element={<SignupPage />} />
+          <Route path="/editor/signup" element={<EditorSignup />} />
           <Route path="/" element={<Homepage />} />
           <Route path="/ourteam" element={<OurTeam />} />
           <Route path="/newsfeed" element={<NewsFeedPage />} />

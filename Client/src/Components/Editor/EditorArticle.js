@@ -8,19 +8,17 @@ import axios from "axios";
 const EditorArticle = () => {
   const [userList, setUserList] = useState([]);
   const params = useParams();
-  //   console.log(params.id);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/articleByeditor/${params.id}`, {
+      .get(`http://localhost:8000/editor/${params.id}`, {
         headers: {
           Authorization: "Bearer " + window.localStorage.getItem("token"),
         },
       })
       .then((response) => {
         setUserList(response.data.articles);
-        console.log(response.data.articles);
-        // console.log(userList);
+        // console.log(response.data.articles);
       });
   }, [params.id]);
 

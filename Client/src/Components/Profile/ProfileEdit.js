@@ -66,16 +66,12 @@ export const ProfileEdit = (props) => {
     if (userinfo.languages.length !== 0)
       newForm.append("categories", userinfo.languages);
 
-    const update = await axios.patch(
-      `http://localhost:8000/updateUser`,
-      newForm,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + window.localStorage.getItem("token"),
-        },
-      }
-    );
+    const update = await axios.patch(`http://localhost:8000/user`, newForm, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + window.localStorage.getItem("token"),
+      },
+    });
 
     Navigate("/edit");
   };

@@ -5,7 +5,7 @@ const axios = require("axios");
 
 const Slider = () => {
   const [Cards, setCards] = useState([]);
-  console.log("hello");
+  // console.log("hello");
   useEffect(() => {
     async function fetchData() {
       try {
