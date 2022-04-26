@@ -58,11 +58,15 @@ const Signup = () => {
 
       console.log(data);
 
-      const response = await axios.post("http://localhost:8000/signup", data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:8000/user/signup",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const message = response.data;
       console.log(message);
@@ -80,7 +84,7 @@ const Signup = () => {
 
           <div className="pageSwitcher">
             <NavLink
-              to="/signup"
+              to="/user/signup"
               activeClassName="pageSwitcherItem-active"
               className="pageSwitcherItem reader"
               style={{ border: "2.5px solid #FF4411" }}
@@ -89,7 +93,7 @@ const Signup = () => {
             </NavLink>
             <NavLink
               exact
-              to="/editorsignup"
+              to="/editor/signup"
               activeClassName="pageSwitcherItem-active"
               className="pageSwitcherItem "
             >
@@ -258,7 +262,7 @@ const Signup = () => {
                 </button>
                 <div className="signup_link">
                   Already a member?{" "}
-                  <Link className="nav-link" to={"/login"}>
+                  <Link className="nav-link" to={"/user/login"}>
                     Sign In
                   </Link>
                 </div>

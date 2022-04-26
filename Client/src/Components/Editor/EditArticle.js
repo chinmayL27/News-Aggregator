@@ -13,7 +13,7 @@ const EditArticle = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     const response = await axios.post(
-      "http://localhost:8000/createArticle",
+      "http://localhost:8000/article",
       {
         title: title,
         content: content,
