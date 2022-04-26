@@ -54,8 +54,8 @@ const NewsCategory = ({ category }) => {
           },
         });
         if (news) {
-          // console.log(news);
-          setCards(news.data.slice(0, 18));
+          // console.log("news", news.data.articles);
+          setCards(news.data.articles.slice(0, 18));
           setLoading(false);
         }
         // console.log(Cards);

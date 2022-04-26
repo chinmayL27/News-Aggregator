@@ -8,6 +8,11 @@ const User = require("../models/user");
 const Article = require("../models/article");
 const multer = require("multer");
 const upload = multer({ dest: "./Images" });
+const Redis = require("redis");
+const dotenv = require("dotenv");
+dotenv.config({ path: "./../config.env" });
+
+const EXPIRY_VAR = process.env.EXPIRY_VAR;
 
 const userAuthCheck = (req, res, next) => {
   if (
@@ -182,29 +187,50 @@ router.delete("/deleteUser", userAuthCheck, async (req, res) => {
   res.send(user);
 });
 
-router.get("/news", userAuthCheck, async (req, res) => {
-  //const category = req.params.category;
-  //console.log(category);
+router.get("/news", async (req, res) => {
   try {
-    var result = await axios.get("https://newsapi.org/v2/top-headlines", {
-      params: {
-        country: "in",
-        apiKey: "4b13a96635744c649cb1e5d769ecedc9",
-        sortBy: "popularity",
-      },
+    const client = await Redis.createClient();
+    client.on("error", (err) => {
+      console.log("REddis error", err);
+      return res.status(400).json({ error: err.message });
     });
-    if (result) {
-      // console.log(result.data);
-      return res.json(JSON.stringify(result.data));
+    await client.connect();
+    console.log("connected");
+    const NEWS = await client.get(`news:all`);
+    if (NEWS) {
+      const resultJSON = JSON.parse(NEWS);
+      console.log("redis result", resultJSON);
+      return res.json(resultJSON);
+    } else {
+      console.log("Fetching Data... news");
+      var result = await axios.get("https://newsapi.org/v2/top-headlines", {
+        params: {
+          country: "in",
+          apiKey: "8b08468bd2174e088385c41a3930dc08",
+          sortBy: "popularity",
+        },
+      });
+      // console.log(result);
+      if (result) {
+        client.SETEX(
+          `news:all`,
+          3600,
+          JSON.stringify({
+            source: "Redis Cache",
+            ...result.data,
+          })
+        );
+        return res.json(result.data);
+      }
+      return res.json("data not found");
     }
-    return res.json("not found");
   } catch (err) {
     console.log(err.message);
     return res.status(400).json({ error: err.message });
   }
 });
 
-router.get("/news/:queryName", userAuthCheck, async (req, res) => {
+router.get("/news/search/:queryName", userAuthCheck, async (req, res) => {
   const queryName = req.params.queryName;
   // console.log("vv",queryName);
   try {
@@ -226,25 +252,46 @@ router.get("/news/:queryName", userAuthCheck, async (req, res) => {
 });
 
 router.get("/news/:category", userAuthCheck, async (req, res) => {
-  const category = req.params.category;
-  console.log(category);
+  var category = req.params.category;
+  category = category.toLowerCase();
+  const client = await Redis.createClient();
+  client.on("error", (err) => {
+    console.log("Reddis error", err);
+    return res.status(400).json({ error: err.message });
+  });
+  await client.connect();
+
   try {
-    const result = await axios.get("https://newsapi.org/v2/top-headlines", {
-      params: {
-        country: "in",
-        category: category,
-        // apiKey: "4b13a96635744c649cb1e5d769ecedc9",
-        // apiKey: "b186e59534794e9a9b732580246cf18a",
-        apiKey: "94c83c96e50d4fec839229c7fbabfb30",
-        // apiKey: "8b08468bd2174e088385c41a3930dc08",
-        sortBy: "popularity",
-      },
-    });
-    if (result) {
-      // console.log(result.data);
-      return res.json(JSON.stringify(result.data));
+    const NEWS = await client.get(`news:${category}`);
+    if (NEWS) {
+      // console.log("redis result", category);
+      const resultJSON = JSON.parse(NEWS);
+      // console.log("redis result", resultJSON);
+      return res.json(resultJSON);
+    } else {
+      console.log("Fetching Data...", category);
+      const result = await axios.get("https://newsapi.org/v2/top-headlines", {
+        params: {
+          country: "in",
+          category: category,
+          apiKey: "8b08468bd2174e088385c41a3930dc08",
+          sortBy: "popularity",
+        },
+      });
+      // console.log(result);
+      if (result) {
+        client.SETEX(
+          `news:${category}`,
+          3600,
+          JSON.stringify({
+            source: "Redis Cache",
+            ...result.data,
+          })
+        );
+        return res.json(result.data);
+      }
+      return res.json("data not found");
     }
-    return res.json("not found");
   } catch (err) {
     console.log(err.message);
     return res.status(400).json({ error: err.message });

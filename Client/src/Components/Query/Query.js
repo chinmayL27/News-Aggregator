@@ -17,7 +17,7 @@ const Query = () => {
     async function fetchData() {
       try {
         const news = await axios.get(
-          `http://localhost:8000/news/${params.queryName}`,
+          `http://localhost:8000/news/search/${params.queryName}`,
           {
             headers: {
               Authorization: "Bearer " + window.localStorage.getItem("token"),
