@@ -191,7 +191,7 @@ router.get("/news", async (req, res) => {
   try {
     const client = await Redis.createClient();
     client.on("error", (err) => {
-      console.log("REddis error", err);
+      console.log("REddis errror", err);
       return res.status(400).json({ error: err.message });
     });
     await client.connect();
