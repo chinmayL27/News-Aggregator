@@ -48,22 +48,16 @@ const NewsCategory = ({ category }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axios.get("https://newsapi.org/v2/top-headlines", {
-          params: {
-            country: "in",
-            category: category,
-             apiKey: "b186e59534794e9a9b732580246cf18a",
-            // apiKey: "9ad6a21779da47c28dde78964e668571",
-           // apikey: "94c83c96e50d4fec839229c7fbabfb30",
-            // apikey: "8b08468bd2174e088385c41a3930dc08",
-            sortBy: "popularity",
+        const news = await axios.get(`http://localhost:8000/news/${category}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
           },
         });
-
-        // console.log(res.data.articles);
-
-        setCards(res.data.articles.slice(0, 18));
-        setLoading(false);
+        if (news) {
+          // console.log("news", news.data.articles);
+          setCards(news.data.articles.slice(0, 18));
+          setLoading(false);
+        }
         // console.log(Cards);
       } catch (err) {
         console.log(err);
@@ -101,9 +95,8 @@ const NewsCategory = ({ category }) => {
       <div className="container">
         <h1 className="title-heading">{category.toUpperCase()}</h1>
       </div>
-      {/* <h1 className="date-right">{category}</h1> */}
       {isLoading ? (
-        <loading />
+        <div></div>
       ) : (
         <>
           <div className="band">

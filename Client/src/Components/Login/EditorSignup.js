@@ -1,34 +1,38 @@
 import React, { useState } from "react";
-import "./login.css";
 import { Link, useNavigate, NavLink } from "react-router-dom";
+import "./editorlogin.css";
+
 import axios from "axios";
 
-const Login = () => {
+let style2 = { marginRight: "30px" };
+
+const EditorSignup = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  console.log("this is the editor signup form");
 
-  const navigate = useNavigate();
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
       let data = JSON.stringify({
+        name: name,
         email: email,
         password: password,
       });
 
       const response = await axios.post(
-        "http://localhost:8000/user/login",
+        "http://localhost:8000/editorSignup",
         data,
         {
           headers: { "Content-Type": "application/json" },
         }
       );
 
-      const token = response.data.token;
-
-      window.localStorage.setItem("token", token);
-
-      navigate("/newsfeed", { replace: true });
+      const message = response.data;
+      console.log(message);
+      navigate("/");
     } catch (error) {
       console.log(error);
     }
@@ -37,33 +41,44 @@ const Login = () => {
   return (
     <>
       <div className="outer">
-        {/* <div className="img-wave"><img src={image} alt=""/></div> */}
-        <div className="center">
-          <h1>Login</h1>
+        <div className="center register">
+          <h1>Sign-Up as a Editor</h1>
+
           <div className="pageSwitcher">
             <NavLink
-              to="/user/login"
+              to="/signup"
               activeClassName="pageSwitcherItem-active"
               className="pageSwitcherItem reader"
-              style={{ border: "2.5px solid #FF4411" }}
             >
               Reader
             </NavLink>
             <NavLink
               exact
-              to="/editor/login"
+              to="/editorsignup"
               activeClassName="pageSwitcherItem-active"
               className="pageSwitcherItem "
+              style={{ border: "2.5px solid #FF4411" }}
             >
               Editor
             </NavLink>
           </div>
 
-          <form id="login-form" onSubmit={onSubmit}>
-            <div className="txt_field">
+          <form id="signupForm" onSubmit={onSubmit}>
+            <div className="txt_field" style={style2}>
               <input
                 type="text"
-                id="login-email"
+                id="signup-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+              <span></span>
+              <label>Name</label>
+            </div>
+            <div className="txt_field">
+              <input
+                type="email"
+                id="signup-email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -74,7 +89,7 @@ const Login = () => {
             <div className="txt_field">
               <input
                 type="password"
-                id="login-password"
+                id="signup-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -82,19 +97,17 @@ const Login = () => {
               <span></span>
               <label>Password</label>
             </div>
-            <div className="pass">Forgot Password?</div>
             <button
               type="submit"
-              id="login-button"
-              className="click-button"
-              value="Login"
+              className="click-button registerbutton"
+              id="register-button"
             >
-              Login
+              Register as Editor
             </button>
             <div className="signup_link">
-              Not a member?{" "}
-              <Link className="nav-link" to={"/user/signup"}>
-                Register
+              Already a member?{" "}
+              <Link className="nav-link" to={"/editorlogin"}>
+                Sign In
               </Link>
             </div>
           </form>
@@ -104,4 +117,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default EditorSignup;

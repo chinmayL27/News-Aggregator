@@ -10,27 +10,33 @@
   padding: 0;
   height: 110vh;
   overflow: hidden;
+  text-decoration: none;
 }
+
 .center {
   position: absolute;
-  top: 50%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 400px;
   background: rgba(247, 247, 247, 0.85);
   border-radius: 10px;
 }
+
 .center.register {
   width: 500px;
 }
+
 .center h1 {
   text-align: center;
   padding: 20px 0;
 }
+
 .center form {
   padding: 0 40px;
   box-sizing: border-box;
 }
+
 form .txt_field {
   position: relative;
   border-bottom: 2px solid #adadad;
@@ -50,6 +56,7 @@ form .inline_field {
   background: none;
   outline: none;
 }
+
 .txt_field label {
   position: absolute;
   top: 50%;
@@ -60,6 +67,7 @@ form .inline_field {
   pointer-events: none;
   transition: 0.5s;
 }
+
 .txt_field span::before {
   content: "";
   position: absolute;
@@ -70,13 +78,15 @@ form .inline_field {
   background: #18191a;
   transition: 0.5s;
 }
-.txt_field input:focus ~ label,
-.txt_field input:valid ~ label {
+
+.txt_field input:focus~label,
+.txt_field input:valid~label {
   top: -5px;
   color: #18191a;
 }
-.txt_field input:focus ~ span::before,
-.txt_field input:valid ~ span::before {
+
+.txt_field input:focus~span::before,
+.txt_field input:valid~span::before {
   width: 100%;
 }
 
@@ -92,13 +102,16 @@ form .inline_field {
   background: none;
   outline: none;
 }
+
 .radio_field .gender {
   margin-right: 30px;
 }
-.gender > input[type="radio"] {
+
+.gender>input[type="radio"] {
   display: none;
 }
-.gender > input[type="radio"] + *::before {
+
+.gender>input[type="radio"]+*::before {
   content: "";
   display: inline-block;
   vertical-align: middle;
@@ -110,16 +123,16 @@ form .inline_field {
   border-width: 0.1rem;
   border-color: rgb(0, 0, 0);
 }
-.gender > input[type="radio"]:checked + *::before {
-  background: radial-gradient(
-    #18191a 0%,
-    #18191a 40%,
-    transparent 50%,
-    transparent
-  );
+
+.gender>input[type="radio"]:checked+*::before {
+  background: radial-gradient(#18191a 0%,
+      #18191a 40%,
+      transparent 50%,
+      transparent);
   border-color: #18191a;
 }
-.gender > input[type="radio"]:checked + * {
+
+.gender>input[type="radio"]:checked+* {
   color: #000000;
 }
 
@@ -128,6 +141,7 @@ form .inline_field {
   color: #3a3838;
   cursor: pointer;
 }
+
 .pass:hover {
   text-decoration: underline;
 }
@@ -153,16 +167,19 @@ form .click-button:hover {
   border-color: #000000;
   transition: 0.5s;
 }
+
 .signup_link {
   margin: 30px 0;
   text-align: center;
   font-size: 16px;
   color: #413e3ee8;
 }
+
 .signup_link a {
   color: #000000;
   text-decoration: none;
 }
+
 .signup_link a:hover {
   text-decoration: underline;
   color: #3a3838;
@@ -173,6 +190,7 @@ form .click-button:hover {
     width: 350px;
     height: 450px;
   }
+
   .center.register {
     width: 425px;
     height: 560px;
@@ -184,8 +202,58 @@ form .click-button:hover {
     width: 350px;
     height: 450px;
   }
+
   .center.register {
     width: 400px;
     height: 550px;
   }
+}
+
+/* page switcher */
+
+.pageSwitcher {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10%;
+}
+
+.reader{
+  margin-right: 10px;
+}
+.pageSwitcherItem {
+  background-color: #f8c1b1;
+  color: #000000;
+  padding: 10px 25px;
+  font-size: 0.9em; 
+  cursor: pointer;
+  
+  outline: none;
+  display: inline-block;
+  text-decoration: none !important;
+  cursor: pointer;
+  outline: none;
+}
+
+/* .pageSwitcherItem-active {
+  background-color: #6b5b95;
+  color: white;
+} */
+
+.pageSwitcherItem:hover{
+  border-color: #ffffff;
+  transition: 0.5s;
+}
+
+.pageSwitcherItem:first-child {
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+  /* border: 10.5px solid #FF4411; */
+}
+.pageSwitcherItem:last-child {
+  border-top-right-radius: 25px;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
 }

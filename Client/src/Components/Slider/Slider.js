@@ -3,10 +3,9 @@ import Carousel from "react-elastic-carousel";
 import "./Slider.css";
 const axios = require("axios");
 
-
 const Slider = () => {
   const [Cards, setCards] = useState([]);
-
+  // console.log("hello");
   useEffect(() => {
     async function fetchData() {
       try {
@@ -30,10 +29,10 @@ const Slider = () => {
   return (
     <div className="outer-div">
       <Carousel infiniteLoop useKeyboardArrows autoPlay>
-        {Cards.map((card,index) => {
+        {Cards.map((card, index) => {
           const { urlToImage, title, author } = card;
-          return (        
-              <div className="Card" key={index}>
+          return (
+            <div className="Card" key={index}>
               <div className="gradient">
                 <img alt="" src={urlToImage} />
               </div>

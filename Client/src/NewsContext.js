@@ -15,22 +15,16 @@ export const NewsProvider = (props) => {
   const [entertainCards, setentertainCards] = useState([]);
   useEffect(() => {
     async function fetchgeneralData() {
+      const category = "general";
       try {
-        const res = await axios.get("https://newsapi.org/v2/top-headlines", {
-          params: {
-            country: "in",
-            category: "general",
-            // apiKey: "b186e59534794e9a9b732580246cf18a",
-             apiKey: "9ad6a21779da47c28dde78964e668571",
-            //apikey: "94c83c96e50d4fec839229c7fbabfb30",
-            // apikey: "8b08468bd2174e088385c41a3930dc08",
-            sortBy: "popularity",
+        const news = await axios.get(`http://localhost:8000/news/${category}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
           },
         });
-
-        // console.log(res.data.articles);
-
-        setgeneralCards(res.data.articles.slice(0, 18));
+        if (news) {
+          setgeneralCards(news.data.slice(0, 18));
+        }
       } catch (err) {
         console.log(err);
       }
@@ -38,22 +32,17 @@ export const NewsProvider = (props) => {
     fetchgeneralData();
 
     async function fetchsportsData() {
+      const category = "sports";
       try {
-        const res = await axios.get("https://newsapi.org/v2/top-headlines", {
-          params: {
-            country: "in",
-            category: "sports",
-            // apiKey: "b186e59534794e9a9b732580246cf18a",
-             apiKey: "9ad6a21779da47c28dde78964e668571",
-            // apikey: "94c83c96e50d4fec839229c7fbabfb30",
-           // apikey: "8b08468bd2174e088385c41a3930dc08",
-            sortBy: "popularity",
+        const news = await axios.get(`http://localhost:8000/news/${category}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
           },
         });
-
-        // console.log(res.data.articles);
-
-        setsportsCards(res.data.articles.slice(0, 18));
+        if (news) {
+          setsportsCards(news.data.slice(0, 18));
+        }
+        // console.log(news.articles);
       } catch (err) {
         console.log(err);
       }
@@ -61,22 +50,16 @@ export const NewsProvider = (props) => {
     fetchsportsData();
 
     async function fetchbusinessData() {
+      const category = "business";
       try {
-        const res = await axios.get("https://newsapi.org/v2/top-headlines", {
-          params: {
-            country: "in",
-            category: "business",
-            // apiKey: "b186e59534794e9a9b732580246cf18a",
-             apiKey: "9ad6a21779da47c28dde78964e668571",
-            // apikey: "94c83c96e50d4fec839229c7fbabfb30",
-           // apikey: "8b08468bd2174e088385c41a3930dc08",
-            sortBy: "popularity",
+        const news = await axios.get(`http://localhost:8000/news/${category}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
           },
         });
-
-        // console.log(res.data.articles);
-
-        setbusinessCards(res.data.articles.slice(0, 18));
+        if (news) {
+          setbusinessCards(news.data.slice(0, 18));
+        }
       } catch (err) {
         console.log(err);
       }
@@ -84,22 +67,18 @@ export const NewsProvider = (props) => {
     fetchbusinessData();
 
     async function fetchtechData() {
+      const category = "technology";
       try {
-        const res = await axios.get("https://newsapi.org/v2/top-headlines", {
-          params: {
-            country: "in",
-            category: "technology",
-            // apiKey: "b186e59534794e9a9b732580246cf18a",
-             apiKey: "9ad6a21779da47c28dde78964e668571",
-           // apikey: "94c83c96e50d4fec839229c7fbabfb30",
-            // apikey: "8b08468bd2174e088385c41a3930dc08",
-            sortBy: "popularity",
+        const news = await axios.get(`http://localhost:8000/news/${category}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
           },
         });
+        if (news) {
+          settechCards(news.data.slice(0, 18));
+        }
 
-        // console.log(res.data.articles);
-
-        settechCards(res.data.articles.slice(0, 18));
+        // console.log(news.articles);
       } catch (err) {
         console.log(err);
       }
@@ -107,20 +86,16 @@ export const NewsProvider = (props) => {
     fetchtechData();
 
     async function fetchentertainData() {
+      const category = "entertainment";
       try {
-        const res = await axios.get("https://newsapi.org/v2/top-headlines", {
-          params: {
-            country: "in",
-            category: "entertainment",
-            // apiKey: "b186e59534794e9a9b732580246cf18a",
-             apiKey: "9ad6a21779da47c28dde78964e668571",
-           // apikey: "94c83c96e50d4fec839229c7fbabfb30",
-            // apikey: "8b08468bd2174e088385c41a3930dc08",
-            sortBy: "popularity",
+        const news = await axios.get(`http://localhost:8000/news/${category}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
           },
         });
-
-        setentertainCards(res.data.articles.slice(0, 18));
+        if (news) {
+          setentertainCards(news.data.slice(0, 18));
+        }
       } catch (err) {
         console.log(err);
       }
@@ -128,22 +103,17 @@ export const NewsProvider = (props) => {
     fetchentertainData();
 
     async function fetchhealthData() {
+      const category = "health";
       try {
-        const res = await axios.get("https://newsapi.org/v2/top-headlines", {
-          params: {
-            country: "in",
-            category: "health",
-            // apiKey: "b186e59534794e9a9b732580246cf18a",
-             apiKey: "9ad6a21779da47c28dde78964e668571",
-            // apikey: "94c83c96e50d4fec839229c7fbabfb30",
-           // apikey: "8b08468bd2174e088385c41a3930dc08",
-            sortBy: "popularity",
+        const news = await axios.get(`http://localhost:8000/news/${category}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
           },
         });
-
-        // console.log(res.data.articles);
-
-        sethealthCards(res.data.articles.slice(0, 18));
+        if (news) {
+          sethealthCards(news.data.slice(0, 18));
+        }
+        // console.log(news.articles)
       } catch (err) {
         console.log(err);
       }

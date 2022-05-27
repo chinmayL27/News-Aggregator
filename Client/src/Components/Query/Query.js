@@ -16,20 +16,23 @@ const Query = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        var apikey = "b186e59534794e9a9b732580246cf18a";
-        const res = await axios.get(
-          `https://newsapi.org/v2/everything?qInTitle=${params.queryName}&apiKey=${apikey}&sortBy=popularity&language=en`
+        const news = await axios.get(
+          `http://localhost:8000/news/search/${params.queryName}`,
+          {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+            },
+          }
         );
-        // apiKey: "b186e59534794e9a9b732580246cf18a",
-        // apiKey: "9ad6a21779da47c28dde78964e668571",
 
-        if (res) {
-          // console.log(res.data.articles);
-          setResult(res.data.articles);
+        if (news) {
+          console.log(news);
+          setResult(news.data);
           setLoading(false);
         }
+        console.log("no newws");
       } catch (err) {
-        console.log(err);
+        console.log(err.message);
       }
     }
     fetchData();
@@ -41,7 +44,7 @@ const Query = () => {
       <div>
         {isLoading ? (
           <Loading />
-        ) : result.length == 0 ? (
+        ) : result.length === 0 ? (
           <div className="container">
             <h1 className="title-heading"> SEARCH RESULT NOT FOUND</h1>
           </div>
@@ -52,7 +55,7 @@ const Query = () => {
             </div>
             <div className="band">
               {result.map((cardd, index) => {
-                const { urlToImage, title, author, url } = cardd;
+                const { title, author } = cardd;
                 return (
                   <div className="item" key={index}>
                     <a href={cardd.url} className="card">

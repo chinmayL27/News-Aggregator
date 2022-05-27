@@ -1,51 +1,472 @@
-const express = require('express');
-const passport = require('passport');
-const jwt = require('jsonwebtoken');
-
+const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const axios = require("axios");
+const Editor = require("../models/editor");
+const User = require("../models/user");
+const Article = require("../models/article");
+const multer = require("multer");
+const upload = multer({ dest: "./Images" });
+const Redis = require("redis");
+const dotenv = require("dotenv");
+dotenv.config({ path: "./../config.env" });
 
-router.post(
-    '/signup',
-    passport.authenticate('signup', { session: false }),
-    async (req, res, next) => {
-      res.json({
-        message: 'Signup successful',
-        user: req.user
+const EXPIRY_VAR = process.env.EXPIRY_VAR;
+
+const userAuthCheck = (req, res, next) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.split(" ")[0] === "Bearer"
+  ) {
+    jwt.verify(
+      req.headers.authorization.split(" ")[1],
+      "randomString",
+      (err, decoded) => {
+        if (err) {
+          res
+            .status(403)
+            .send({ success: false, message: "Failed to authenticate user." });
+        } else {
+          req.user = decoded;
+          next();
+        }
+      }
+    );
+  } else {
+    res.status(403).send({ success: false, message: "No Token Provided." });
+  }
+};
+
+const editorAuthCheck = (req, res, next) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.split(" ")[0] === "Bearer"
+  ) {
+    jwt.verify(
+      req.headers.authorization.split(" ")[1],
+      "editorString",
+      (err, decoded) => {
+        if (err) {
+          res
+            .status(403)
+            .send({ success: false, message: "Failed to authenticate user." });
+        } else {
+          req.editor = decoded;
+          next();
+        }
+      }
+    );
+  } else {
+    res.status(403).send({ success: false, message: "No Token Provided." });
+  }
+};
+
+router.post("/signup", async (req, res) => {
+  const { email, name, password, categories, image } = req.body;
+  try {
+    let user = await User.findOne({
+      email,
+    });
+    if (user) {
+      return res.status(400).json({
+        msg: "User Already Exists",
       });
     }
-  );
 
-router.post(
-    '/login',
-    async (req, res, next) => {
-      passport.authenticate(
-        'login',
-        async (err, user, info) => {
-          try {
-            if (err || !user) {
-              const error = new Error('An error occurred.');
-  
-              return next(error);
-            }
-  
-            req.login(
-              user,
-              { session: false },
-              async (error) => {
-                if (error) return next(error);
-  
-                const body = { _id: user._id, email: user.email };
-                const token = jwt.sign({ user: body }, 'TOP_SECRET');
-  
-                return res.json({ token,body });
-              }
-            );
-          } catch (error) {
-            return next(error);
-          }
-        }
-      )(req, res, next);
+    user = new User({
+      email,
+      name,
+      password,
+      categories,
+      image,
+    });
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
+    await user.save();
+
+    const payload = {
+      id: user.id,
+    };
+
+    jwt.sign(
+      payload,
+      "randomString",
+      {
+        expiresIn: 10000,
+      },
+      (err, token) => {
+        if (err) throw err;
+        res.status(200).json({
+          token,
+          user,
+        });
+      }
+    );
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send("Error in Saving");
+  }
+});
+
+router.post("/login", async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    let user = await User.findOne({
+      email,
+    });
+    if (!user)
+      return res.status(400).json({
+        message: "User Doesn't Exist",
+      });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res.status(400).json({
+        message: "Incorrect Password !",
+      });
+
+    const payload = { id: user.id };
+
+    jwt.sign(
+      payload,
+      "randomString",
+      {
+        expiresIn: 3600,
+      },
+      (err, token) => {
+        if (err) throw err;
+        res.status(200).json({
+          token,
+        });
+      }
+    );
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
+router.get("/user", userAuthCheck, async (req, res) => {
+  const user = await User.findById(req.user.id);
+  res.send(user);
+});
+
+router.get("/getAllUsers", userAuthCheck, async (req, res) => {
+  const users = await User.find();
+  res.status(200).json({ users });
+});
+
+router.patch(
+  "/updateUser",
+  userAuthCheck,
+  upload.single("picture"),
+  async (req, res) => {
+    const user = await User.findById(req.user.id);
+    if (req.body.categories)
+      req.body.categories = req.body.categories.split(",");
+    if (req.file && req.file.filename) {
+      user.image = req.file.filename;
+      user.save();
+    }
+    user.updateOne(req.body, function (err, result) {
+      if (err) {
+        console.log(err, "err");
+      } else {
+        res.status(200).send({ message: "User updated Successfully " });
+      }
+    });
+  }
+);
+router.delete("/deleteUser", userAuthCheck, async (req, res) => {
+  const user = await User.deleteOne({ _id: req.user.id });
+  res.send(user);
+});
+
+router.get("/news", async (req, res) => {
+  try {
+    const client = await Redis.createClient();
+    client.on("error", (err) => {
+      console.log("REddis errror", err);
+      return res.status(400).json({ error: err.message });
+    });
+    await client.connect();
+    console.log("connected");
+    const NEWS = await client.get(`news:all`);
+    if (NEWS) {
+      const resultJSON = JSON.parse(NEWS);
+      console.log("redis result", resultJSON);
+      return res.json(resultJSON);
+    } else {
+      console.log("Fetching Data... news");
+      var result = await axios.get("https://newsapi.org/v2/top-headlines", {
+        params: {
+          country: "in",
+          apiKey: "8b08468bd2174e088385c41a3930dc08",
+          sortBy: "popularity",
+        },
+      });
+      // console.log(result);
+      if (result) {
+        client.SETEX(
+          `news:all`,
+          3600,
+          JSON.stringify({
+            source: "Redis Cache",
+            ...result.data,
+          })
+        );
+        return res.json(result.data);
+      }
+      return res.json("data not found");
+    }
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+router.get("/news/search/:queryName", userAuthCheck, async (req, res) => {
+  const queryName = req.params.queryName;
+  // console.log("vv",queryName);
+  try {
+    // var apikey = "b186e59534794e9a9b732580246cf18a"
+    var apikey = "4b13a96635744c649cb1e5d769ecedc9";
+    const result = await axios.get(
+      `https://newsapi.org/v2/everything?qInTitle=${queryName}&apiKey=${apikey}&sortBy=popularity&language=en`
+    );
+
+    if (result) {
+      // console.log(result.data);
+      return res.json(result.data.articles);
+    }
+    return res.json("not found");
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+router.get("/news/:category", userAuthCheck, async (req, res) => {
+  var category = req.params.category;
+  category = category.toLowerCase();
+  const client = await Redis.createClient();
+  client.on("error", (err) => {
+    console.log("Reddis error", err);
+    return res.status(400).json({ error: err.message });
+  });
+  await client.connect();
+
+  try {
+    const NEWS = await client.get(`news:${category}`);
+    if (NEWS) {
+      // console.log("redis result", category);
+      const resultJSON = JSON.parse(NEWS);
+      // console.log("redis result", resultJSON);
+      return res.json(resultJSON);
+    } else {
+      console.log("Fetching Data...", category);
+      const result = await axios.get("https://newsapi.org/v2/top-headlines", {
+        params: {
+          country: "in",
+          category: category,
+          apiKey: "8b08468bd2174e088385c41a3930dc08",
+          sortBy: "popularity",
+        },
+      });
+      // console.log(result);
+      if (result) {
+        client.SETEX(
+          `news:${category}`,
+          3600,
+          JSON.stringify({
+            source: "Redis Cache",
+            ...result.data,
+          })
+        );
+        return res.json(result.data);
+      }
+      return res.json("data not found");
+    }
+  } catch (err) {
+    console.log(err.message);
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+router.post("/editorSignup", async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    let editor = await Editor.findOne({
+      email,
+    });
+    if (editor) {
+      return res.status(400).json({
+        msg: "Editor Already Exists",
+      });
+    }
+
+    editor = new Editor({
+      email,
+      name,
+      password,
+    });
+
+    const salt = await bcrypt.genSalt(10);
+    editor.password = await bcrypt.hash(password, salt);
+
+    await editor.save();
+
+    const payload = {
+      id: editor.id,
+    };
+
+    jwt.sign(
+      payload,
+      "editorString",
+      {
+        expiresIn: 10000,
+      },
+      (err, token) => {
+        if (err) throw err;
+        res.status(200).json({
+          editor,
+          token,
+        });
+      }
+    );
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send("Error in Saving");
+  }
+});
+
+router.post("/editorLogin", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    let editor = await Editor.findOne({
+      email,
+    });
+    if (!editor)
+      return res.status(400).json({
+        message: "Editor Doesn't Exist",
+      });
+
+    const isMatch = await bcrypt.compare(password, editor.password);
+    if (!isMatch)
+      return res.status(400).json({
+        message: "Incorrect Password !",
+      });
+
+    const payload = { id: editor.id };
+
+    jwt.sign(
+      payload,
+      "editorString",
+      {
+        expiresIn: 3600,
+      },
+      (err, token) => {
+        if (err) throw err;
+        res.status(200).json({
+          token,
+        });
+      }
+    );
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
+router.get("/editor", editorAuthCheck, (req, res) => {
+  res.send(req.editor);
+});
+
+router.get("/getAllEditors", userAuthCheck, async (req, res) => {
+  const editors = await Editor.find();
+  res.status(200).json({ editors });
+});
+
+router.delete("/deleteEditor", editorAuthCheck, async (req, res) => {
+  const editor = await Editor.deleteOne({ _id: req.editor.id });
+  res.send(editor);
+});
+
+router.get("/getArticles", editorAuthCheck, async (req, res) => {
+  try {
+    const articles = await Article.find();
+    res.status(200).json({ articles });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
+router.post("/createArticle", editorAuthCheck, async (req, res) => {
+  const { title, content } = req.body;
+
+  try {
+    const article = await Article.create({
+      title,
+      content,
+      author: req.editor.id,
+    });
+
+    res.status(201).json({ message: "Article created successfully", article });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+router.get("/articleByeditor/:id", userAuthCheck, async (req, res) => {
+  try {
+    const author = await Editor.findById(req.params.id);
+
+    const articles = await Article.find({ author });
+    res.status(200).json({ articles });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
+router.get("/getArticleById/:id", editorAuthCheck, async (req, res) => {
+  try {
+    const article = await Article.findById(req.params.id);
+    res.status(200).json({ article });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+});
+
+router.post("/upload", upload.single("picture"), (req, res) => {
+  const file = req.file;
+  if (!file) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    return next(error);
+  }
+  res.send(file);
+});
+
+router.get("/photo/:id", (req, res) => {
+  var filename = req.params.id;
+
+  db.collection("mycollection").findOne(
+    { _id: ObjectId(filename) },
+    (err, result) => {
+      if (err) return console.log(err);
+
+      res.contentType("image/jpeg");
+      res.send(result.image.buffer);
     }
   );
+});
 
 module.exports = router;

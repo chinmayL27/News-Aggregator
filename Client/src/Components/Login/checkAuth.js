@@ -7,13 +7,13 @@ const checkAuth = ()=>{
 
     else{
         const token = window.localStorage.getItem('token'); 
-        var decode = jwt.verify(token, 'TOP_SECRET');
+        var decode = jwt.verify(token, 'randomString');
 
         if (!decode){
             return false;
         }
 
-        return true;
+        return decode;
 
         
 

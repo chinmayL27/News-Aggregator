@@ -1,4 +1,6 @@
+
 # News-Aggregator
+# Group-5
 ## News Aggregator - A Common-place for Daily News
 Reading news has also been a part of human lifestyle
 since centuries. Newspapers, magazines and articles
@@ -66,6 +68,7 @@ We uses a number of tech stacks to work properly:
 - NodeJS for backend for web applications
 - ExpressJS for back end web application framework for Node.js
 - MongoDB for database to store infromation of user crendintials and information.
+- Swagger, Multer, Morgan, etc for make application more professional and secure.
 
 ## Contributors
 ### Group-5
@@ -74,3 +77,5 @@ We uses a number of tech stacks to work properly:
 - Vedant Dhoble (S20190010187)
 - Chinmay Lohani (S20190010035)
 - Arihant Jain (S20190010010)
+- Isha Agarwal (S20180010067)
+
